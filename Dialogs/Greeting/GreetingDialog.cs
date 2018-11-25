@@ -31,7 +31,7 @@ namespace Microsoft.BotBuilderSamples
 
         // Minimum length requirements for city and name
         private const int NameLengthMinValue = 3;
-        private const int CityLengthMinValue = 3;
+        private const int CityLengthMinValue = 4;
 
         // Dialog IDs
         private const string ProfileDialog = "profileDialog";
