@@ -23,6 +23,7 @@ namespace Microsoft.BotBuilderSamples
         // Supported LUIS Intents
         public const string GreetingIntent = "Greeting";
         public const string CancelIntent = "Cancel";
+        public const string WeatherIntent = "Weather";
         public const string HelpIntent = "Help";
         public const string NoneIntent = "None";
 
@@ -118,6 +119,9 @@ namespace Microsoft.BotBuilderSamples
                                     await dc.BeginDialogAsync(nameof(GreetingDialog));
                                     break;
 
+                                case WeatherIntent:
+                                    await dc.Context.SendActivityAsync("Weather dialog will be realise soon.");
+                                    break;
                                 case NoneIntent:
                                 default:
                                     // Help or no intent identified, either way, let's provide some help.

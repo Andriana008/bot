@@ -1,0 +1,10 @@
+> Weather intent and utterances
+> See https://github.com/Microsoft/botbuilder-tools/tree/master/packages/Ludown to learn more about .lu files and the Ludown CLI tool.
+# Weather
+- send me current weather
+- weather
+- say me weather
+- what is weather for today
+- say me forecast
+- forecast
+- what about weather
