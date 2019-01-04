@@ -132,6 +132,7 @@ namespace BasicBot.Dialogs.Weather
             if (results == null)
             {
                 await context.SendActivityAsync($"No city");
+                weatherState.City = null;
                 return await stepContext.EndDialogAsync();
             }
             //var message = stepContext.Context.Activity.AsMessageActivity();
