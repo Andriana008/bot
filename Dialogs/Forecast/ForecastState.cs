@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BasicBot.Dialogs.Weather
+namespace BasicBot.Dialogs.Forecast
 {
-    public class WeatherState
+    public class ForecastState
     {
         public string City { get; set; }
     }

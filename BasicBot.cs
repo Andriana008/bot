@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BasicBot.Dialogs.Forecast;
+using BasicBot.Dialogs.Weather;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -24,6 +26,7 @@ namespace Microsoft.BotBuilderSamples
         public const string GreetingIntent = "Greeting";
         public const string CancelIntent = "Cancel";
         public const string WeatherIntent = "Weather";
+        public const string ForecastIntent = "Forecast";
         public const string HelpIntent = "Help";
         public const string NoneIntent = "None";
 
@@ -34,6 +37,8 @@ namespace Microsoft.BotBuilderSamples
         public static readonly string LuisConfiguration = "BasicBotLuisApplication";
 
         private readonly IStatePropertyAccessor<GreetingState> _greetingStateAccessor;
+        private readonly IStatePropertyAccessor<WeatherState> _weatherStateAccessor;
+        private readonly IStatePropertyAccessor<ForecastState> _forecastStateAccessor;
         private readonly IStatePropertyAccessor<DialogState> _dialogStateAccessor;
         private readonly UserState _userState;
         private readonly ConversationState _conversationState;
@@ -51,6 +56,8 @@ namespace Microsoft.BotBuilderSamples
             _conversationState = conversationState ?? throw new ArgumentNullException(nameof(conversationState));
 
             _greetingStateAccessor = _userState.CreateProperty<GreetingState>(nameof(GreetingState));
+            _weatherStateAccessor = _userState.CreateProperty<WeatherState>(nameof(WeatherState));
+            _forecastStateAccessor = _userState.CreateProperty<ForecastState>(nameof(ForecastState));
             _dialogStateAccessor = _conversationState.CreateProperty<DialogState>(nameof(DialogState));
 
             // Verify LUIS configuration.
@@ -61,7 +68,10 @@ namespace Microsoft.BotBuilderSamples
 
             Dialogs = new DialogSet(_dialogStateAccessor);
             Dialogs.Add(new GreetingDialog(_greetingStateAccessor, loggerFactory));
+            Dialogs.Add(new WeatherDialog(_weatherStateAccessor, loggerFactory));
+            Dialogs.Add(new ForecastDialog(_forecastStateAccessor, loggerFactory));
         }
+    
 
         private DialogSet Dialogs { get; set; }
 
@@ -120,7 +130,11 @@ namespace Microsoft.BotBuilderSamples
                                     break;
 
                                 case WeatherIntent:
-                                    await dc.Context.SendActivityAsync("Weather dialog will be realise soon.");
+                                    //await dc.Context.SendActivityAsync("Weather dialog will be realise soon.");
+                                    await dc.BeginDialogAsync(nameof(WeatherDialog));
+                                    break;
+                                case ForecastIntent:
+                                    await dc.BeginDialogAsync(nameof(ForecastDialog));
                                     break;
                                 case NoneIntent:
                                 default:
