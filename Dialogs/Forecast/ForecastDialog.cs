@@ -32,12 +32,11 @@ namespace BasicBot.Dialogs.Forecast
             var waterfallSteps = new WaterfallStep[]
             {
                 InitializeStateStepAsync,
-                //PromptForNameStepAsync,
                 PromptForCityStepAsync,
                 DisplayWeatherStateStepAsync,
             };
             AddDialog(new WaterfallDialog(ProfileDialog, waterfallSteps));
-            // AddDialog(new TextPrompt(NamePrompt, ValidateName));
+           
             AddDialog(new TextPrompt(CityPrompt, ValidateCity));
         }
         private async Task<DialogTurnResult> InitializeStateStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -64,14 +63,7 @@ namespace BasicBot.Dialogs.Forecast
         {
             // Save name, if prompted.
             var weatherState = await UserProfileAccessor.GetAsync(stepContext.Context);
-            //var lowerCaseName = stepContext.Result as string;
-            //if (string.IsNullOrWhiteSpace(weatherState.Name) && lowerCaseName != null)
-            //{
-            //    // Capitalize and set name.
-            //    weatherState.Name = char.ToUpper(lowerCaseName[0]) + lowerCaseName.Substring(1);
-            //    await UserProfileAccessor.SetAsync(stepContext.Context, weatherState);
-            //}
-
+          
             if (string.IsNullOrWhiteSpace(weatherState.City))
             {
                 var opts = new PromptOptions
@@ -79,7 +71,7 @@ namespace BasicBot.Dialogs.Forecast
                     Prompt = new Activity
                     {
                         Type = ActivityTypes.Message,
-                        Text = $"Hello what city do you what to know weather?",
+                        Text = $"Hello for which city do you what to get forecast?",
                     },
                 };
                 return await stepContext.PromptAsync(CityPrompt, opts);
@@ -126,12 +118,7 @@ namespace BasicBot.Dialogs.Forecast
 
             return await weatherUser(stepContext);
         }
-        //public override Task<object> FulfillAsync(WaterfallStepContext stepContext)
-        //{
-        //    var weatherState = await UserProfileAccessor.GetAsync(stepContext);
-        //    var result = GetCard(weatherState.City);
-        //    return Task.FromResult((object)result);
-        //}
+
 
         private static AdaptiveCard GetCard(string place)
         {
@@ -237,34 +224,15 @@ namespace BasicBot.Dialogs.Forecast
         private async Task<DialogTurnResult> weatherUser(WaterfallStepContext stepContext)
         {
             var context = stepContext.Context;
-            //var weatherState = await UserProfileAccessor.GetAsync(context);
-            //var results = GetCard(weatherState.City);
-            //if (results == null)
-            //{
-            //    await context.SendActivityAsync($"No city");
-            //}
-            //else
-            //{
-            //    await Task.FromResult((object)result);
-            //    // await context.SendActivityAsync(
-            //    //     $"The temperature in {weatherState.City} is {results.Main.Temperature.CelsiusCurrent}C and {results.Main.Temperature.FahrenheitCurrent}F. There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction.");
-            //}
-            //// Display their profile information and end dialog.
-            //weatherState.City = null;
-            //return await stepContext.EndDialogAsync();
-
+           
             IMessageActivity message = null;
             message = await GetMessage(stepContext, new AdaptiveCards.AdaptiveCard(), "Weather card");
-            //var weatherCard = (AdaptiveCards.AdaptiveCard)actionResult;
+
             if (message == null)
             {
                 message = context.Activity.AsMessageActivity();
                 message.Text = $"I couldn't find the weather for '{context.Activity.AsMessageActivity().Text}'.  Are you sure that's a real city?";
             }
-            //else
-            //{
-
-            // }
 
             await context.SendActivityAsync(message);
             return await stepContext.EndDialogAsync();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AdaptiveCards;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -27,12 +28,11 @@ namespace BasicBot.Dialogs.Weather
             var waterfallSteps = new WaterfallStep[]
             {
                 InitializeStateStepAsync,
-                //PromptForNameStepAsync,
                 PromptForCityStepAsync,
                 DisplayWeatherStateStepAsync,
             };
             AddDialog(new WaterfallDialog(ProfileDialog, waterfallSteps));
-           // AddDialog(new TextPrompt(NamePrompt, ValidateName));
+         
             AddDialog(new TextPrompt(CityPrompt, ValidateCity));
         }
         private async Task<DialogTurnResult> InitializeStateStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -59,14 +59,7 @@ namespace BasicBot.Dialogs.Weather
         {
             // Save name, if prompted.
             var weatherState = await UserProfileAccessor.GetAsync(stepContext.Context);
-            //var lowerCaseName = stepContext.Result as string;
-            //if (string.IsNullOrWhiteSpace(weatherState.Name) && lowerCaseName != null)
-            //{
-            //    // Capitalize and set name.
-            //    weatherState.Name = char.ToUpper(lowerCaseName[0]) + lowerCaseName.Substring(1);
-            //    await UserProfileAccessor.SetAsync(stepContext.Context, weatherState);
-            //}
-
+           
             if (string.IsNullOrWhiteSpace(weatherState.City))
             {
                 var opts = new PromptOptions
@@ -74,7 +67,7 @@ namespace BasicBot.Dialogs.Weather
                     Prompt = new Activity
                     {
                         Type = ActivityTypes.Message,
-                        Text = $"Hello what city do you what to know weather?",
+                        Text = $"Hello in which city do you what to know weather?",
                     },
                 };
                 return await stepContext.PromptAsync(CityPrompt, opts);
@@ -136,34 +129,82 @@ namespace BasicBot.Dialogs.Weather
                 weatherState.City = null;
                 return await stepContext.EndDialogAsync();
             }
-            //var message = stepContext.Context.Activity.AsMessageActivity();
-            //Attachment attachment = new Attachment();
-            //attachment.ContentType = "image/png";
-            //attachment.ContentUrl = GetIconUrl(results.Weathers[0].Icon);
-            //message.Attachments.Add(attachment);
-            //message.Text =
-            //        $"The temperature in {weatherState.City} is {results.Main.Temperature.CelsiusCurrent}C and {results.Main.Temperature.FahrenheitCurrent}F." +
-            //        $" There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction.";
-            //await context.SendActivityAsync($"The temperature in {weatherState.City} is {results.Main.Temperature.CelsiusCurrent}C and {results.Main.Temperature.FahrenheitCurrent}F." +
-            //                                            $" There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction.");
-            // Display their profile information and end dialog.
-            var thumbnailCard = new ThumbnailCard
-            {
-                Images = new List<CardImage> { new CardImage(GetIconUrl(results.Weathers[0].Icon)) },
-                // title of the card  
-                Title = $"{weatherState.City}",
-                //subtitle of the card  
-                Subtitle = $"The temperature in { weatherState.City} is { results.Main.Temperature.CelsiusCurrent}C and { results.Main.Temperature.FahrenheitCurrent}F." +$" There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction." 
-      
-            };
-            var message = stepContext.Context.Activity.AsMessageActivity();
+          
+            IMessageActivity message = null;
+            
+            var result = GetCard(weatherState.City);
+            message = stepContext.Context.Activity.AsMessageActivity();
             if (message.Attachments == null)
                 message.Attachments = new List<Attachment>();
-            message.Attachments.Add(thumbnailCard.ToAttachment());
+            var attachment = new Attachment()
+            {
+                Content = result,
+                ContentType = "application/vnd.microsoft.card.adaptive",
+                Name = "Weather card"
+            };
+            message.Attachments.Add(attachment);
+           
+            if (message == null)
+            {
+                message = context.Activity.AsMessageActivity();
+                message.Text = $"I couldn't find the weather for '{context.Activity.AsMessageActivity().Text}'.  Are you sure that's a real city?";
+            }
+          
             await context.SendActivityAsync(message);
+
             weatherState.City = null;
             return await stepContext.EndDialogAsync();
             
+        }
+
+        private static AdaptiveCard GetCard(string place)
+        {
+            var client = new OpenWeatherAPI.OpenWeatherAPI("27db98240a74caf542be70bc49ecff4f");
+            var results = client.Query(place);
+            var card = new AdaptiveCard();
+            if (results != null)
+            {
+                card.Speak = $"<s>Today the temperature is {results.Main.Temperature.CelsiusCurrent} in {place}</s><s>Winds are {results.Wind.SpeedMetersPerSecond} metrs per second from the {results.Wind.Direction}</s>";
+                AddCurrentWeather(results, card);
+                return card;
+
+            }
+            return null;
+        }
+        private static void AddCurrentWeather(OpenWeatherAPI.Query model, AdaptiveCard card)
+        {
+            var current = new ColumnSet();
+            card.Body.Add(current);
+
+            var currentColumn = new Column();
+            current.Columns.Add(currentColumn);
+            currentColumn.Size = "35";
+
+            var currentImage = new Image();
+            currentColumn.Items.Add(currentImage);
+            currentImage.Url = GetIconUrl(model.Weathers[0].Icon);
+
+            var currentColumn2 = new Column();
+            current.Columns.Add(currentColumn2);
+            currentColumn2.Size = "65";
+
+
+
+            AddTextBlock(currentColumn2, $"{model.Name}", TextSize.Large, false);
+            AddTextBlock(currentColumn2, $"{model.Main.Temperature.CelsiusCurrent}° C", TextSize.Large);
+            AddTextBlock(currentColumn2, $"{model.Weathers[0].Description}", TextSize.Medium);
+            AddTextBlock(currentColumn2, $"Winds {model.Wind.SpeedMetersPerSecond} mps {model.Wind.Direction}", TextSize.Medium);
+        }
+        private static void AddTextBlock(Column column, string text, TextSize size, bool isSubTitle = true)
+        {
+            column.Items.Add(new TextBlock()
+            {
+                Text = text,
+                Size = size,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                IsSubtle = isSubTitle,
+                Separation = SeparationStyle.None
+            });
         }
         private static string GetIconUrl(string url)
         {

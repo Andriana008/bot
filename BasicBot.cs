@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BasicBot.Dialogs.Forecast;
+using BasicBot.Dialogs.RandomImage;
 using BasicBot.Dialogs.Weather;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
@@ -29,6 +30,8 @@ namespace Microsoft.BotBuilderSamples
         public const string ForecastIntent = "Forecast";
         public const string HelpIntent = "Help";
         public const string NoneIntent = "None";
+        public const string ImageIntent = "RandomImage";
+        public const string QuoteIntent = "Quotes";
 
         /// <summary>
         /// Key in the bot config (.bot file) for the LUIS instance.
@@ -40,6 +43,8 @@ namespace Microsoft.BotBuilderSamples
         private readonly IStatePropertyAccessor<WeatherState> _weatherStateAccessor;
         private readonly IStatePropertyAccessor<ForecastState> _forecastStateAccessor;
         private readonly IStatePropertyAccessor<DialogState> _dialogStateAccessor;
+        private readonly IStatePropertyAccessor<RandomImageState> _randomStateAccessor;
+
         private readonly UserState _userState;
         private readonly ConversationState _conversationState;
         private readonly BotServices _services;
@@ -58,7 +63,9 @@ namespace Microsoft.BotBuilderSamples
             _greetingStateAccessor = _userState.CreateProperty<GreetingState>(nameof(GreetingState));
             _weatherStateAccessor = _userState.CreateProperty<WeatherState>(nameof(WeatherState));
             _forecastStateAccessor = _userState.CreateProperty<ForecastState>(nameof(ForecastState));
+            _randomStateAccessor = _userState.CreateProperty<RandomImageState>(nameof(RandomImageState));
             _dialogStateAccessor = _conversationState.CreateProperty<DialogState>(nameof(DialogState));
+
 
             // Verify LUIS configuration.
             if (!_services.LuisServices.ContainsKey(LuisConfiguration))
@@ -70,6 +77,7 @@ namespace Microsoft.BotBuilderSamples
             Dialogs.Add(new GreetingDialog(_greetingStateAccessor, loggerFactory));
             Dialogs.Add(new WeatherDialog(_weatherStateAccessor, loggerFactory));
             Dialogs.Add(new ForecastDialog(_forecastStateAccessor, loggerFactory));
+            Dialogs.Add(new RandomImageDialog(_randomStateAccessor,loggerFactory));
         }
     
 
@@ -136,6 +144,9 @@ namespace Microsoft.BotBuilderSamples
                                 case ForecastIntent:
                                     await dc.BeginDialogAsync(nameof(ForecastDialog));
                                     break;
+                                case ImageIntent:
+                                    await dc.BeginDialogAsync(nameof(RandomImageDialog));
+                                    break;                                
                                 case NoneIntent:
                                 default:
                                     // Help or no intent identified, either way, let's provide some help.
