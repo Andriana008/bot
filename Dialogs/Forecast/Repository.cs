@@ -79,7 +79,7 @@ namespace APIXULib
 
             // List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode && response.ReasonPhrase=="OK") 
             {
                 // Parse the response body. Blocking!
                 return response.Content.ReadAsAsync<WeatherModel>().Result;

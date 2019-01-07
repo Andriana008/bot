@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
@@ -125,13 +126,13 @@ namespace BasicBot.Dialogs.Weather
         {
             var context = stepContext.Context;
             var weatherState = await UserProfileAccessor.GetAsync(context);
-
+         
             var client = new OpenWeatherAPI.OpenWeatherAPI("27db98240a74caf542be70bc49ecff4f");
-
+           
             var results = client.Query(weatherState.City);
             if (results == null)
             {
-                await context.SendActivityAsync($"No city");
+                await context.SendActivityAsync($"I couldn't find the weather for '{weatherState.City}'.  Are you sure that's a real city?");
                 weatherState.City = null;
                 return await stepContext.EndDialogAsync();
             }
@@ -143,10 +144,23 @@ namespace BasicBot.Dialogs.Weather
             //message.Text =
             //        $"The temperature in {weatherState.City} is {results.Main.Temperature.CelsiusCurrent}C and {results.Main.Temperature.FahrenheitCurrent}F." +
             //        $" There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction.";
-            await context.SendActivityAsync($"The temperature in {weatherState.City} is {results.Main.Temperature.CelsiusCurrent}C and {results.Main.Temperature.FahrenheitCurrent}F." +
-                                                        $" There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction.");
+            //await context.SendActivityAsync($"The temperature in {weatherState.City} is {results.Main.Temperature.CelsiusCurrent}C and {results.Main.Temperature.FahrenheitCurrent}F." +
+            //                                            $" There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction.");
             // Display their profile information and end dialog.
-
+            var thumbnailCard = new ThumbnailCard
+            {
+                Images = new List<CardImage> { new CardImage(GetIconUrl(results.Weathers[0].Icon)) },
+                // title of the card  
+                Title = $"{weatherState.City}",
+                //subtitle of the card  
+                Subtitle = $"The temperature in { weatherState.City} is { results.Main.Temperature.CelsiusCurrent}C and { results.Main.Temperature.FahrenheitCurrent}F." +$" There is {results.Wind.SpeedFeetPerSecond} f/s wind in the {results.Wind.Direction} direction." 
+      
+            };
+            var message = stepContext.Context.Activity.AsMessageActivity();
+            if (message.Attachments == null)
+                message.Attachments = new List<Attachment>();
+            message.Attachments.Add(thumbnailCard.ToAttachment());
+            await context.SendActivityAsync(message);
             weatherState.City = null;
             return await stepContext.EndDialogAsync();
             
@@ -159,7 +173,7 @@ namespace BasicBot.Dialogs.Weather
             if (url.StartsWith("http"))
                 return url;
             //some clients do not accept \\
-            return "https://cdn.apixu.com/weather/64x64/day/" + url;
+            return "http://openweathermap.org/img/w/" + url + ".png";
         }
     }
 }

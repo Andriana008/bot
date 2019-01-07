@@ -254,24 +254,18 @@ namespace BasicBot.Dialogs.Forecast
             //return await stepContext.EndDialogAsync();
 
             IMessageActivity message = null;
+            message = await GetMessage(stepContext, new AdaptiveCards.AdaptiveCard(), "Weather card");
             //var weatherCard = (AdaptiveCards.AdaptiveCard)actionResult;
-            //if (weatherCard == null)
-            //{
-            //    message = context.Activity.AsMessageActivity();
-            //    message.Text = $"I couldn't find the weather for '{context.Activity.AsMessageActivity().Text}'.  Are you sure that's a real city?";
-            //}
+            if (message == null)
+            {
+                message = context.Activity.AsMessageActivity();
+                message.Text = $"I couldn't find the weather for '{context.Activity.AsMessageActivity().Text}'.  Are you sure that's a real city?";
+            }
             //else
             //{
-                message = await GetMessage(stepContext, new AdaptiveCards.AdaptiveCard(), "Weather card");
-           // }
-            //if (message.Attachments.Count==1)
-            //{
-            //    message.Text = $"I couldn't find the weather for '{context.Activity.AsMessageActivity().Text}'.";
-            //}
-            //else
-            //{
-                
-            //}
+
+            // }
+
             await context.SendActivityAsync(message);
             return await stepContext.EndDialogAsync();
         }
