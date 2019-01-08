@@ -144,11 +144,7 @@ namespace BasicBot.Dialogs.Weather
             };
             message.Attachments.Add(attachment);
            
-            if (message == null)
-            {
-                message = context.Activity.AsMessageActivity();
-                message.Text = $"I couldn't find the weather for '{context.Activity.AsMessageActivity().Text}'.  Are you sure that's a real city?";
-            }
+           
           
             await context.SendActivityAsync(message);
 

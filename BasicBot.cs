@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BasicBot.Dialogs.Forecast;
+using BasicBot.Dialogs.Quotes;
 using BasicBot.Dialogs.RandomImage;
 using BasicBot.Dialogs.Weather;
 using Microsoft.Bot.Builder;
@@ -44,6 +45,7 @@ namespace Microsoft.BotBuilderSamples
         private readonly IStatePropertyAccessor<ForecastState> _forecastStateAccessor;
         private readonly IStatePropertyAccessor<DialogState> _dialogStateAccessor;
         private readonly IStatePropertyAccessor<RandomImageState> _randomStateAccessor;
+        private readonly IStatePropertyAccessor<QuoteState> _QuoteStateAccessor;
 
         private readonly UserState _userState;
         private readonly ConversationState _conversationState;
@@ -64,6 +66,7 @@ namespace Microsoft.BotBuilderSamples
             _weatherStateAccessor = _userState.CreateProperty<WeatherState>(nameof(WeatherState));
             _forecastStateAccessor = _userState.CreateProperty<ForecastState>(nameof(ForecastState));
             _randomStateAccessor = _userState.CreateProperty<RandomImageState>(nameof(RandomImageState));
+            _QuoteStateAccessor = _userState.CreateProperty<QuoteState>(nameof(QuoteState));
             _dialogStateAccessor = _conversationState.CreateProperty<DialogState>(nameof(DialogState));
 
 
@@ -78,6 +81,7 @@ namespace Microsoft.BotBuilderSamples
             Dialogs.Add(new WeatherDialog(_weatherStateAccessor, loggerFactory));
             Dialogs.Add(new ForecastDialog(_forecastStateAccessor, loggerFactory));
             Dialogs.Add(new RandomImageDialog(_randomStateAccessor,loggerFactory));
+            Dialogs.Add(new QuoteDialog(_QuoteStateAccessor, loggerFactory));
         }
     
 
@@ -146,7 +150,10 @@ namespace Microsoft.BotBuilderSamples
                                     break;
                                 case ImageIntent:
                                     await dc.BeginDialogAsync(nameof(RandomImageDialog));
-                                    break;                                
+                                    break;
+                                case QuoteIntent:
+                                    await dc.BeginDialogAsync(nameof(QuoteDialog));
+                                    break;
                                 case NoneIntent:
                                 default:
                                     // Help or no intent identified, either way, let's provide some help.
@@ -217,6 +224,7 @@ namespace Microsoft.BotBuilderSamples
             {
                 await dc.Context.SendActivityAsync("Let me try to provide some help.");
                 await dc.Context.SendActivityAsync("I understand greetings, being asked for help, or being asked to cancel what I am doing.");
+                await dc.Context.SendActivityAsync("Also 'weather' 'forecast' 'image' 'quote' is keywords for approptiate actions)");
                 if (dc.ActiveDialog != null)
                 {
                     await dc.RepromptDialogAsync();

@@ -7,14 +7,12 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
 using Newtonsoft.Json.Linq;
 using Unsplasharp;
-using Attachment = Microsoft.Bot.Schema.Attachment;
 
-namespace BasicBot.Dialogs.RandomImage
+namespace BasicBot.Dialogs.Quotes
 {
-    public class RandomImageDialog : ComponentDialog
+    public class QuoteDialog : ComponentDialog
     {
         private const string ImageStateProperty = "quoteState";
 
@@ -22,11 +20,11 @@ namespace BasicBot.Dialogs.RandomImage
         private const string CityPrompt = "cityPrompt";
         private const string ProfileDialog = "profileDialog";
 
-        public IStatePropertyAccessor<RandomImageState> UserProfileAccessor { get; }
+        public IStatePropertyAccessor<QuoteState> UserProfileAccessor { get; }
 
-        public RandomImageDialog(IStatePropertyAccessor<RandomImageState> userProfileStateAccessor,
+        public QuoteDialog(IStatePropertyAccessor<QuoteState> userProfileStateAccessor,
             ILoggerFactory loggerFactory)
-            : base(nameof(RandomImageDialog))
+            : base(nameof(QuoteDialog))
         {
             UserProfileAccessor = userProfileStateAccessor ??
                                   throw new ArgumentNullException(nameof(userProfileStateAccessor));
@@ -64,7 +62,7 @@ namespace BasicBot.Dialogs.RandomImage
                     Prompt = new Activity
                     {
                         Type = ActivityTypes.Message,
-                        Text = $"Hello,choose categories(nature,water,sun) of image?",
+                        Text = $"Hello,choose categories(programming) of quote ? ",
                     },
                 };
                 return await stepContext.PromptAsync(CityPrompt, opts);
@@ -77,7 +75,7 @@ namespace BasicBot.Dialogs.RandomImage
         }
 
 
-       
+
         private async Task<DialogTurnResult> DisplayWeatherStateStepAsync(
            WaterfallStepContext stepContext,
            CancellationToken cancellationToken)
@@ -102,68 +100,66 @@ namespace BasicBot.Dialogs.RandomImage
         {
             var weatherState = await UserProfileAccessor.GetAsync(stepContext.Context);
             var context = stepContext.Context;
-            IMessageActivity message = stepContext.Context.Activity.AsMessageActivity();
-            if (message.Attachments == null)
-                message.Attachments = new List<Attachment>();
+          
+            
             //string url = await GetIconUrl(weatherState.categories);
-            var client = new UnsplasharpClient("197125b8b757915cb7481bbca1167c12e9a65d3b9e43905cafad5beb271eac96");
-            var randomPhotosFromQuery =
-                await client.GetRandomPhoto(true, count: 1, query: weatherState.categories);
-            var randomPhotosFromQuery2 =
-                await client.GetRandomPhoto(true, count: 1, query: "cat");
-            string x = randomPhotosFromQuery.First().Urls.Full;
-            message.Attachments.Add(new Attachment()
+            IMessageActivity message = null;
+            if (weatherState.categories.ToLower() == "programming")
             {
-                ContentUrl = x,
-                ContentType = "image/png",
-                Name = "random.png"
-            });
+                message = await GetProgrammer(stepContext, new AdaptiveCards.AdaptiveCard(), "Quote card");
+                if (message.Attachments == null)
+                    message.Attachments = new List<Attachment>();
+                await context.SendActivityAsync(message);
+                weatherState.categories = null;
+                return await stepContext.EndDialogAsync();
+            }
+
             weatherState.categories = null;
 
-            await context.SendActivityAsync(message);
+            await context.SendActivityAsync("other categories will be realised soon");
 
             return await stepContext.EndDialogAsync();
 
         }
 
-        private async Task<string> GetIconUrl(string url)
+      
+        private async Task<IMessageActivity> GetProgrammer(WaterfallStepContext stepContext, AdaptiveCards.AdaptiveCard card, string cardName)
         {
             string urll =
-                "https://api.unsplash.com/photos/?client_id=197125b8b757915cb7481bbca1167c12e9a65d3b9e43905cafad5beb271eac96&random/?" +
-                url;
-            var client = new UnsplasharpClient("197125b8b757915cb7481bbca1167c12e9a65d3b9e43905cafad5beb271eac96");
-            var randomPhotosFromQuery = await client.GetRandomPhoto(count: 1, query: "nature");
+                "http://quotes.stormconsultancy.co.uk/random.json";
+            var message = stepContext.Context.Activity.AsMessageActivity();
+            JObject jsonData = JObject.Parse(new System.Net.WebClient().DownloadString(urll));
+            string t= jsonData.SelectToken("author").ToString();
+            string a= jsonData.SelectToken("quote").ToString();
+            var thumbnailCard = new ThumbnailCard
+            {
+                Title = t,
+                Text = a,
 
-
-
-            if (string.IsNullOrEmpty(url))
-                return string.Empty;
-
-            //some clients do not accept \\
-            return randomPhotosFromQuery.First().Urls.Full + ".png";
+            };
+            if (message.Attachments == null)
+                message.Attachments = new List<Attachment>();
+            message.Attachments.Add(thumbnailCard.ToAttachment());
+            return message;
         }
-
         private async Task<DialogTurnResult> InitializeStateStepAsync(WaterfallStepContext stepContext,
             CancellationToken cancellationToken)
         {
             var weatherState = await UserProfileAccessor.GetAsync(stepContext.Context, () => null);
             if (weatherState == null)
             {
-                var weatherStateOpt = stepContext.Options as RandomImageState;
+                var weatherStateOpt = stepContext.Options as QuoteState;
                 if (weatherStateOpt != null)
                 {
                     await UserProfileAccessor.SetAsync(stepContext.Context, weatherStateOpt);
                 }
                 else
                 {
-                    await UserProfileAccessor.SetAsync(stepContext.Context, new RandomImageState());
+                    await UserProfileAccessor.SetAsync(stepContext.Context, new QuoteState());
                 }
             }
 
             return await stepContext.NextAsync();
         }
-
     }
 }
-
-

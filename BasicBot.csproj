@@ -25,6 +25,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="unsplasharp.api" Version="0.5.7" />
   </ItemGroup>
 
   <ItemGroup>
