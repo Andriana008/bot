@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BasicBot.Dialogs.Forecast;
+using BasicBot.Dialogs.News;
 using BasicBot.Dialogs.Quotes;
 using BasicBot.Dialogs.RandomImage;
 using BasicBot.Dialogs.Weather;
@@ -33,6 +34,7 @@ namespace Microsoft.BotBuilderSamples
         public const string NoneIntent = "None";
         public const string ImageIntent = "RandomImage";
         public const string QuoteIntent = "Quotes";
+        public const string NewsIntent = "News";
 
         /// <summary>
         /// Key in the bot config (.bot file) for the LUIS instance.
@@ -46,6 +48,7 @@ namespace Microsoft.BotBuilderSamples
         private readonly IStatePropertyAccessor<DialogState> _dialogStateAccessor;
         private readonly IStatePropertyAccessor<RandomImageState> _randomStateAccessor;
         private readonly IStatePropertyAccessor<QuoteState> _QuoteStateAccessor;
+        private readonly IStatePropertyAccessor<NewsState> _newsStateAccessor;
 
         private readonly UserState _userState;
         private readonly ConversationState _conversationState;
@@ -68,7 +71,7 @@ namespace Microsoft.BotBuilderSamples
             _randomStateAccessor = _userState.CreateProperty<RandomImageState>(nameof(RandomImageState));
             _QuoteStateAccessor = _userState.CreateProperty<QuoteState>(nameof(QuoteState));
             _dialogStateAccessor = _conversationState.CreateProperty<DialogState>(nameof(DialogState));
-
+            _newsStateAccessor = _userState.CreateProperty<NewsState>(nameof(NewsState));
 
             // Verify LUIS configuration.
             if (!_services.LuisServices.ContainsKey(LuisConfiguration))
@@ -82,6 +85,7 @@ namespace Microsoft.BotBuilderSamples
             Dialogs.Add(new ForecastDialog(_forecastStateAccessor, loggerFactory));
             Dialogs.Add(new RandomImageDialog(_randomStateAccessor,loggerFactory));
             Dialogs.Add(new QuoteDialog(_QuoteStateAccessor, loggerFactory));
+            Dialogs.Add(new NewsDialog(_newsStateAccessor, loggerFactory));
         }
     
 
@@ -153,6 +157,9 @@ namespace Microsoft.BotBuilderSamples
                                     break;
                                 case QuoteIntent:
                                     await dc.BeginDialogAsync(nameof(QuoteDialog));
+                                    break;
+                                case NewsIntent:
+                                    await dc.BeginDialogAsync(nameof(NewsDialog));
                                     break;
                                 case NoneIntent:
                                 default:
