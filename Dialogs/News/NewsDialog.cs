@@ -62,7 +62,7 @@ namespace BasicBot.Dialogs.News
                     Prompt = new Activity
                     {
                         Type = ActivityTypes.Message,
-                        Text = $"Hello,choose category of news?",
+                        Text = $"What news are you looking for?",
                     },
                 };
                 return await stepContext.PromptAsync(CityPrompt, opts);

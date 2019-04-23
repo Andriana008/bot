@@ -231,7 +231,7 @@ namespace Microsoft.BotBuilderSamples
             {
                 await dc.Context.SendActivityAsync("Let me try to provide some help.");
                 await dc.Context.SendActivityAsync("I understand greetings, being asked for help, or being asked to cancel what I am doing.");
-                await dc.Context.SendActivityAsync("Also 'weather' 'forecast' 'image' 'quote' is keywords for approptiate actions)");
+                await dc.Context.SendActivityAsync("Also 'weather' 'forecast' 'image' 'quote' 'news' is keywords for approptiate actions)");
                 if (dc.ActiveDialog != null)
                 {
                     await dc.RepromptDialogAsync();

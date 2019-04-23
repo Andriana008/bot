@@ -62,7 +62,7 @@ namespace BasicBot.Dialogs.Quotes
                     Prompt = new Activity
                     {
                         Type = ActivityTypes.Message,
-                        Text = $"Hello,choose categories(programming) of quote ? ",
+                        Text = $"Do you whant some programming quote?",
                     },
                 };
                 return await stepContext.PromptAsync(CityPrompt, opts);
@@ -104,7 +104,7 @@ namespace BasicBot.Dialogs.Quotes
             
             //string url = await GetIconUrl(weatherState.categories);
             IMessageActivity message = null;
-            if (weatherState.categories.ToLower() == "programming")
+            if (weatherState.categories.ToLower() == "yes")
             {
                 message = await GetProgrammer(stepContext, new AdaptiveCards.AdaptiveCard(), "Quote card");
                 if (message.Attachments == null)

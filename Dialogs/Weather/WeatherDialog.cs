@@ -67,7 +67,7 @@ namespace BasicBot.Dialogs.Weather
                     Prompt = new Activity
                     {
                         Type = ActivityTypes.Message,
-                        Text = $"Hello in which city do you what to know weather?",
+                        Text = $"For which city do you what to know weather?",
                     },
                 };
                 return await stepContext.PromptAsync(CityPrompt, opts);

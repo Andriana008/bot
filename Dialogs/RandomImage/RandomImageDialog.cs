@@ -64,7 +64,7 @@ namespace BasicBot.Dialogs.RandomImage
                     Prompt = new Activity
                     {
                         Type = ActivityTypes.Message,
-                        Text = $"Hello,choose categories(nature,water,sun) of image?",
+                        Text = $"Choose categories(nature,water,sun) of image?",
                     },
                 };
                 return await stepContext.PromptAsync(CityPrompt, opts);
