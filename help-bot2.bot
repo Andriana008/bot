@@ -4,22 +4,13 @@
   "version": "2.0",
   "services": [
     {
-      "tenantId": "b41b72d0-4e9f-4c26-8a69-f949f367c91d",
-      "subscriptionId": "ae83e650-b83d-485d-bf54-ca170034a5ec",
-      "resourceGroup": "bot2",
-      "serviceName": "help-bot2",
+      "tenantId": "3f8420bd-90e2-44ed-99b3-ea4a1aa68199",
+      "subscriptionId": "efa216f2-f8c0-41eb-a15d-eb86e682ee62",
+      "resourceGroup": "diplom",
+      "serviceName": "diplom",
       "type": "abs",
-      "name": "help-bot2",
+      "name": "diplom",
       "id": "1"
-    },
-    {
-      "connectionString": "2Z2j1u0uWX3CroOnRFAZZg==!bjCYvA6aBw6XM7kSvprEK6ahdduOKJgnZEa4yrWLrkncsMrEQVc1VQMyNdr8ydxruPHYuOR/Ldro/tyzVGIycsDpSJpgnzCRvTm1rp43eDlqhFl7fsPGzDT9Nzv36oBt2Dt7CcFXowThAl3fSQee1NOwSg0OjoLWoTKYltBGutUfFvaTVj2aGFQ4eRdf+Ysd4Y7iVrgsC87aNaI9eJRHyg==",
-      "tenantId": "b41b72d0-4e9f-4c26-8a69-f949f367c91d",
-      "subscriptionId": "ae83e650-b83d-485d-bf54-ca170034a5ec",
-      "resourceGroup": "bot2",
-      "serviceName": "helpbot2afb7",
-      "type": "blob",
-      "id": "2"
     },
     {
       "appId": "",
@@ -27,26 +18,15 @@
       "endpoint": "http://localhost:3978/api/messages",
       "type": "endpoint",
       "name": "development",
-      "id": "3"
+      "id": "2"
     },
     {
-      "appId": "64695da4-6abe-4a99-8ff2-69686a4f8ad9",
-      "appPassword": "g9sW/SJbW6guprs13JpgbQ==!mX08YBrgPcB/5+wsKBGTmdon0uzPqyZwyshH+fe7g+4=",
-      "endpoint": "https://help-bot2.azurewebsites.net/api/messages",
+      "appId": "9f94bf37-6cd0-4c02-99ee-1b3ae2afb870",
+      "appPassword": ")}mZ>UvRkD|qR.UNs=|]4&c>F@aBU^",
+      "endpoint": "https://diplom-bbcf.azurewebsites.net/api/messages",
       "type": "endpoint",
       "name": "production",
-      "id": "4"
-    },
-    {
-      "instrumentationKey": "hos+LqvsP2hf+chjiAkJ3A==!gWUibRkLssj1rtGueBoZBMxvJXdrcL9NvVOFD/0qWzoLa4G+OKakY2FM/trIpXya",
-      "applicationId": "bc38c0f5-bc3f-4942-96ee-5f4e70f09539",
-      "apiKeys": {},
-      "tenantId": "b41b72d0-4e9f-4c26-8a69-f949f367c91d",
-      "subscriptionId": "ae83e650-b83d-485d-bf54-ca170034a5ec",
-      "resourceGroup": "bot2",
-      "serviceName": "help-bot2sgkqm7",
-      "type": "appInsights",
-      "id": "5"
+      "id": "3"
     },
     {
       "appId": "3ba5dc12-4657-4e6e-ac70-db786735a8b7",
@@ -55,7 +35,7 @@
       "region": "westus",
       "type": "luis",
       "name": "BasicBotLuisApplication",
-      "id": "6"
+      "id": "4"
     }
   ]
 }
